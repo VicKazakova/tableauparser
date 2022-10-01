@@ -9,7 +9,7 @@ from pymongo.errors import DuplicateKeyError
 url = 'https://hh.ru/search/vacancy'
 
 client = MongoClient('127.0.0.1', 27017)
-db = client['hh_jobs']
+db = client['hh']
 
 vacancies = db.vacancies
 # job = input('Enter the job position: ')
@@ -19,13 +19,13 @@ headers = \
     {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) '
                    'Chrome/96.0.4664.110 Safari/537.36'}
 params = {'clusters': 'true',
-          'area': 1,
+          #'area': 1,
           'ored_clusters': 'true',
           'enable_snippets': 'true',
           'salary': None,
           'text': job,
-          'page': 1,
-          'hhtmFrom': 'vacancy_search_list'}
+          'page': 1 }
+          #'hhtmFrom': 'vacancy_search_list'}
 
 while True:
     response = requests.get(url, params=params, headers=headers)
@@ -34,7 +34,7 @@ while True:
     if not soup.find('a', {'data-qa': 'pager-next'}):
         break
 
-    jobs = soup.find_all('div', {'class': 'vacancy-serp-item'})
+    jobs = soup.find_all('div', {'class': 'serp-item'})
     for job in jobs:
         job_data = {}
         info = job.find('a')
@@ -61,7 +61,6 @@ while True:
             currency = None
         try:
             company = job.find('a', {'data-qa': 'vacancy-serp__vacancy-employer'}).text
-            print(company)
             new_company = re.sub("[^a-z0-9а-яА-Я]+", " ", company, flags=re.IGNORECASE)
         except AttributeError:
             new_company = None
